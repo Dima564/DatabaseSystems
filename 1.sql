@@ -51,6 +51,7 @@ create table Goals(
 **************************************************************************************/
 create table ToDoItems (
 	todo_id int auto_increment primary key,
+	user int,
 	goal int not null,
 	title char(255) not null,
 	isDone int not null,
@@ -95,6 +96,7 @@ create table Participants (
 	Constraint fk_participants_project foreign key (project) references Projects(project_id)
 );
 
+-- TODO ALTER + REPORT WITH CODE
 
 
 /**************************************************************************************
@@ -143,8 +145,12 @@ insert into ToDoItems(goal, title, isDone)
 	values (2,'use case3',0);
 insert into ToDoItems(goal, title, isDone)
 	values (2,'use case4',1);
-insert into ToDoItems(goal, title, isDone)
-	values (2,'use case5',0);
+insert into ToDoItems(goal, title, user, isDone)
+	values (2,'use case5',1,0);
+insert into ToDoItems(goal, title, user, isDone)
+	values (2,'use case5',2,0);
+insert into ToDoItems(goal, title, user, isDone)
+	values (2,'use case5',3,0);
 
 
 insert into Comments(author,project,title,message)
@@ -202,45 +208,76 @@ select * from Comments;
 -- select title from Projects where project_id not in (select project from Participants);
 /*
 -- 3.1
+-- create simple view
 create view user_view as
 select FirstName, LastName, Email 
 from Users; 
 
 select * from user_view;
 
--- 3.2
+-- 3.2 
+-- select user names ordered by user id 
 select FirstName from Users order by UserId asc;
+-- obvious
 select Email from Users where Userid < 5;
+*/
+
+/*
+select FirstName, LastName from Users where UserId in
+(select user from ToDoItems where user is not null);
+
+select FirstName, LastName from
+Users join ToDoItems 
+on Users.UserId = ToDoItems.user;
+*/
+
+select FirstName, LastName from Users where UserId IN
+(SELECT user FROM ToDoItems WHERE ToDoItems.goal IN 
+(SELECT goal_id FROM Goals WHERE Goals.project IN 
+(SELECT Projects.project_id FROM Projects WHERE Projects.title = 'Booster')) 
+AND user is not null);
 
 
+select FirstName, LastName from Users where UserId IN 
 
+-- TODO joins
+/*
 -- 3.3
+-- all users that have ever commented
 select FirstName from Users where UserId in (select author from Comments order by comment_id) ;
+-- all projects that have a due date
 select * from Projects where duedate is not null;
+-- all projects that have people involved in them
 select title from Projects where project_id not in (select project from Participants);
 
 -- 3.4
+-- username and comment
 select Users.Username, Comments.message
 from Comments 
 inner join Users
 on Users.Userid = Comments.author order by Comments.comment_id;
 
-*/
 
-/*
+-- 
 select * from Projects left join Participants 
 on Projects.project_id = Participants.project;
 
 
+-- 
 select * from Projects right join Participants 
 on Projects.project_id = Participants.project;
+
+-- 3.5
+-- union all 
+
 
 
 (select * from Users where UserId < 3)
 union 
 (select * from Users where UserId > 3);
-
 */
+
+
 
 
 
@@ -275,7 +312,6 @@ ON Participants.project = Projects.project_id
 GROUP BY Projects.title) as IKnowThisSucks;
 
 
-
 -- Print projects which have number of participants > 3
 SELECT Title FROM (
 SELECT Projects.title as Title, Participants.user
@@ -298,7 +334,7 @@ DELETE FROM ToDoItems
 WHERE isDone=1;
 
 SELECT * FROM ToDoItems;
-
+*/
 
 -- Naming convention - ?
 
