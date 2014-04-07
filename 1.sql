@@ -1,4 +1,6 @@
 
+
+DROP DATABASE IF  EXISTS boost;
 create database boost;
 use boost;
 
@@ -96,7 +98,7 @@ create table Participants (
 	Constraint fk_participants_project foreign key (project) references Projects(project_id)
 );
 
--- TODO ALTER + REPORT WITH CODE
+
 
 
 /**************************************************************************************
@@ -231,16 +233,36 @@ Users join ToDoItems
 on Users.UserId = ToDoItems.user;
 */
 
-select FirstName, LastName from Users where UserId IN
-(SELECT user FROM ToDoItems WHERE ToDoItems.goal IN 
-(SELECT goal_id FROM Goals WHERE Goals.project IN 
-(SELECT Projects.project_id FROM Projects WHERE Projects.title = 'Booster')) 
-AND user is not null);
 
+-- the good way
+SELECT Users.FirstName, Users.LastName 
+FROM Users LEFT JOIN ToDoItems ON ToDoItems.user = Users.UserId
+JOIN Participants ON Users.UserId = Participants.user
+JOIN Projects ON Participants.project = Projects.project_id
+WHERE ToDoItems.user IS NULL
+AND Projects.title = 'Booster';
 
-select FirstName, LastName from Users where UserId IN 
+-- the bad way
+SELECT Username FROM
+Projects JOIN Participants 
+ON  project_id=project
+JOIN Users 
+ON Participants.user = Users.UserId
+WHERE Participants.user  NOT IN 
+(SELECT user from ToDoItems WHERE user is NOT null)
+AND Projects.title = 'Booster';
+-- 
+-- SELECT User.Username FROM 
+-- (
+-- 	-- (SElECT * FROM Projects WHERE Projects.title = 'Booster')
+-- JOIN
+-- Participants ON Projects.project_id = Participants.project
+-- JOIN 
+-- Users ON Participants.user = Users.UserId);
 
 -- TODO joins
+
+
 /*
 -- 3.3
 -- all users that have ever commented
@@ -268,7 +290,7 @@ select * from Projects right join Participants
 on Projects.project_id = Participants.project;
 
 -- 3.5
--- union all 
+-- union all allows duplicates
 
 
 
@@ -276,7 +298,7 @@ on Projects.project_id = Participants.project;
 union 
 (select * from Users where UserId > 3);
 */
-
+/*
 
 
 
