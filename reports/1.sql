@@ -233,7 +233,7 @@ Users join ToDoItems
 on Users.UserId = ToDoItems.user;
 */
 
-/*
+
 -- the good way
 SELECT Users.FirstName, Users.LastName 
 FROM Users LEFT JOIN ToDoItems ON ToDoItems.user = Users.UserId
@@ -262,7 +262,7 @@ AND Projects.title = 'Booster';
 
 -- TODO joins
 
-*/
+
 /*
 -- 3.3
 -- all users that have ever commented
@@ -291,11 +291,14 @@ on Projects.project_id = Participants.project;
 
 -- 3.5
 -- union all allows duplicates
+
+
+
 (select * from Users where UserId < 3)
 union 
 (select * from Users where UserId > 3);
 */
-
+/*
 
 
 
@@ -352,11 +355,8 @@ SELECT * FROM ToDoItems;
 DELETE FROM ToDoItems
 WHERE isDone=1;
 
-ALTER TABLE ToDoItems
-ADD priority int;
-
 SELECT * FROM ToDoItems;
-
+*/
 
 -- Naming convention - ?
 
